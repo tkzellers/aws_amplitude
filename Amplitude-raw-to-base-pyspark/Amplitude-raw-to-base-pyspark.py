@@ -1,12 +1,12 @@
 import sys
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
-from pyspark.sql.functions import col, dayofmonth, hour, month, year
+from pyspark.sql.functions import col, explode, dayofmonth, hour, month, year
 
 
 def flatten_dataframe(df):
@@ -78,10 +78,11 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
 
-today = datetime.now()
-year_str = today.strftime("%Y")
-month_str = today.strftime("%m")
-day_str = today.strftime("%d")
+today = datetime.utcnow()
+yesterday = (today - timedelta(days=1))
+year_str = yesterday.strftime("%Y")
+month_str = yesterday.strftime("%m")
+day_str = yesterday.strftime("%d")
 
 try:
     s3_source_basepath = args['source_bucket']
