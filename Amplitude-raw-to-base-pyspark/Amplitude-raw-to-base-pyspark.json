@@ -1,0 +1,43 @@
+{
+  "name" : "Amplitude-raw-to-base-pyspark",
+  "jobMode" : "SCRIPT",
+  "description" : "",
+  "role" : "arn:aws:iam::182489713502:role/tkz-amplitude-glue-role",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-182489713502-us-east-1/scripts/Amplitude-raw-to-base-pyspark.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--enable-glue-datacatalog" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--target_bucket" : "s3://tkz-amplitude-base-parquet/files/",
+    "--TempDir" : "s3://aws-glue-assets-182489713502-us-east-1/temporary/",
+    "--source_bucket" : "s3://tkz-amplitude/processed-amplitude-raw/",
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-182489713502-us-east-1/sparkHistoryLogs/",
+    "--enable-job-insights" : "true",
+    "--enable-observability-metrics" : "true",
+    "--conf" : "spark.eventLog.rolling.enabled=true --conf spark.sql.catalog.glue_catalog.glue.skip-name-validation=true",
+    "--enable-continuous-cloudwatch-log" : "true",
+    "--job-language" : "python"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 10,
+  "timeout" : 480,
+  "maxCapacity" : 10.0,
+  "glueVersion" : "5.1",
+  "numberOfWorkers" : 10,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "aws_amplitude",
+    "branch" : "setup",
+    "folder" : "Amplitude-raw-to-base-pyspark"
+  }
+}
