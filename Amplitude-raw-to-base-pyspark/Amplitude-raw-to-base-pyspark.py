@@ -8,6 +8,44 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql.functions import col, dayofmonth, hour, month, year
 
+
+def flatten_dataframe(df):
+    """Dynamically flattens nested structs and explodes arrays in a Spark DataFrame."""
+    while True:
+        # Identify complex types (Structs and Arrays)
+        struct_fields = [
+            f.name for f in df.schema.fields if f.dataType.typeName() == "struct"
+        ]
+        array_fields = [
+            f.name for f in df.schema.fields if f.dataType.typeName() == "array"
+        ]
+
+        if not struct_fields and not array_fields:
+            break  # DataFrame is completely flat
+
+        # 1. Flatten Structs
+        if struct_fields:
+            for field_name in struct_fields:
+                # Expand struct columns into 'structName_fieldName'
+                struct_schema = df.schema[field_name].dataType
+                expanded_cols = [
+                    col(f"{field_name}.{sub_f.name}").alias(
+                        f"{field_name}_{sub_f.name}"
+                    )
+                    for sub_f in struct_schema.fields
+                ]
+                # Drop original struct and append expanded columns
+                df = df.select("*", *expanded_cols).drop(field_name)
+
+        # 2. Explode Arrays (Optional: Handle with care as it multiplies rows)
+        if array_fields:
+            for field_name in array_fields:
+                df = df.withColumn(field_name, explode(col(field_name)))
+
+    return df
+
+
+
 def get_logger(job_name):
     logger = logging.getLogger(job_name)
     logger.setLevel(logging.INFO)
@@ -62,21 +100,7 @@ try:
     if record_count == 0:
         logger.error('no records found in source path, terminating glue job')
     
-    df_base = df_raw.select(
-        'event_id',
-        'session_id',
-        'user_id',
-        'device_id',
-        'amplitude_id',
-        'ip_address',
-        'country',
-        'region',
-        'city',
-        'device_family',
-        'device_type',
-        'event_time',
-        'server_received_time'
-        )
+    df_base = flatten_dataframe(df_raw)
     
     df_partition = (
         df_base.withColumn("year", year("server_received_time")).

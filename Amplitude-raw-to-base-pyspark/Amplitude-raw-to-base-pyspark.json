@@ -37,7 +37,7 @@
   "sourceControlDetails" : {
     "provider" : "GITHUB",
     "repository" : "aws_amplitude",
-    "branch" : "setup",
+    "branch" : "proper_flatten",
     "folder" : "Amplitude-raw-to-base-pyspark"
   }
 }
