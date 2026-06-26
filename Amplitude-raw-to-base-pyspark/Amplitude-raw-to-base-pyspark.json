@@ -14,9 +14,9 @@
   "defaultArguments" : {
     "--enable-glue-datacatalog" : "true",
     "--job-bookmark-option" : "job-bookmark-disable",
-    "--target_bucket" : "s3://tkz-amplitude-base-parquet/files/",
+    "--target_bucket" : "s3://tkz-amplitude-base-parquet",
     "--TempDir" : "s3://aws-glue-assets-182489713502-us-east-1/temporary/",
-    "--source_bucket" : "s3://tkz-amplitude/processed-amplitude-raw/",
+    "--source_bucket" : "s3://tkz-amplitude",
     "--enable-metrics" : "true",
     "--enable-spark-ui" : "true",
     "--spark-event-logs-path" : "s3://aws-glue-assets-182489713502-us-east-1/sparkHistoryLogs/",
